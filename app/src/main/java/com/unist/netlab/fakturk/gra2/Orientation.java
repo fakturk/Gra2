@@ -133,4 +133,15 @@ public class Orientation
         return newRotation;
     }
 
+    void printRotation(float[][]R)
+    {
+        System.out.println("Rotation Matrix: ");
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                System.out.print(R[i][j]+" ");
+            }
+            System.out.println();
+        }
+    }
+
 }

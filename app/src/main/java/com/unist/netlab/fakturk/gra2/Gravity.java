@@ -63,5 +63,15 @@ public class Gravity
         return gD;
     }
 
+    void printGravity(float[] gravity)
+    {
+        System.out.print("gravity: ");
+        for (int i = 0; i < 3; i++) {
+            System.out.print(gravity[i]+" ");
+        }
+        System.out.println();
+
+    }
+
 
 }
