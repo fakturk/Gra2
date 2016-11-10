@@ -30,7 +30,7 @@ class DynamicAcceleration
     DynamicAcceleration()
     {
         timeInMillis = 10;
-        deltaT = timeInMillis/1000;
+        this.deltaT = (float) (timeInMillis*1.0/1000);
         oldAcc = new float[]{0.0f, 0.0f, 0.0f};
         oldGyr = new float[]{0.0f, 0.0f, 0.0f};
         dynAcc = new float[]{0.0f, 0.0f, 0.0f};
@@ -42,7 +42,7 @@ class DynamicAcceleration
     public DynamicAcceleration(long time)
     {
         timeInMillis = time;
-        deltaT = timeInMillis/1000;
+        this.deltaT = (float) (timeInMillis*1.0/1000);
         oldAcc = new float[]{0.0f, 0.0f, 0.0f};
         oldGyr = new float[]{0.0f, 0.0f, 0.0f};
         dynAcc = new float[]{0.0f, 0.0f, 0.0f};
@@ -83,7 +83,7 @@ class DynamicAcceleration
         float[] accDiff = accDiff(acc,oldAcc);
         float[] graDiff = g.getGravityDifference(oldRotationMatrix,gyr,deltaT);
         float[][] R = orientation.updateRotationMatrix(oldRotationMatrix,gyr,deltaT);
-        float[] gravity = g.gravityAfterRotation(oldGra,R);
+        float[] gravity = g.gravityAfterRotation(R);
 
         for (int i = 0; i < 3; i++)
         {

@@ -126,15 +126,15 @@ public class MainActivity extends AppCompatActivity
                 if (start)
                 {
 
-                    float thresholdAcc = 0f;
-                    float thresholdGyr = 0f;
+                    float thresholdAcc = 0; //0.15
+                    float thresholdGyr = 0.15f; //0.2
                     float accNorm = (float) Math.sqrt(Math.pow(acc[0],2)+Math.pow(acc[1],2)+Math.pow(acc[2],2));
                     //if phone stable gravity = acc
-                    if ((Math.abs(gyr[0])+Math.abs(gyr[1])+Math.abs(gyr[2]))<thresholdGyr && Math.abs(accNorm - GRAVITY_EARTH)<thresholdAcc)
+                    if ((Math.abs(gyr[0])+Math.abs(gyr[1])+Math.abs(gyr[2]))<thresholdGyr )
                     {
 
                         System.out.print("stable, ");
-                        if (counter>100) //if phone is stable over a second
+                        if (counter>10) //if phone is stable over a second
                         {
                             for (int j = 0; j < 3; j++)
                             {
@@ -152,27 +152,27 @@ public class MainActivity extends AppCompatActivity
 
 
                     }
-                    // if not rotating
-                    else if ((Math.abs(gyr[0])+Math.abs(gyr[1])+Math.abs(gyr[2]))<thresholdGyr && Math.abs(accNorm - GRAVITY_EARTH)>=thresholdAcc)
-                    {
-                        System.out.print("linear, ");
-                        counter=0;
-                    }
-                    // if rotating but not moving
-                    else if ((Math.abs(gyr[0])+Math.abs(gyr[1])+Math.abs(gyr[2]))>=thresholdGyr && Math.abs(accNorm - GRAVITY_EARTH)<thresholdAcc)
-                    {
-                        System.out.print("rotate, ");
-                        counter=0;
-                        for (int j = 0; j < 3; j++)
-                        {
-                            gravity[j] = acc[j]*(GRAVITY_EARTH/accNorm);
-
-                        }
-                        rotation = orientation.rotationFromGravity(gravity);
-//                        orientation.setRotationMatrix(rotation);
-
-
-                    }
+//                    // if not rotating
+//                    else if ((Math.abs(gyr[0])+Math.abs(gyr[1])+Math.abs(gyr[2]))<thresholdGyr && Math.abs(accNorm - GRAVITY_EARTH)>=thresholdAcc)
+//                    {
+//                        System.out.print("linear, ");
+//                        counter=0;
+//                    }
+//                    // if rotating but not moving
+//                    else if ((Math.abs(gyr[0])+Math.abs(gyr[1])+Math.abs(gyr[2]))>=thresholdGyr && Math.abs(accNorm - GRAVITY_EARTH)<thresholdAcc)
+//                    {
+//                        System.out.print("rotate, ");
+//                        counter=0;
+//                        for (int j = 0; j < 3; j++)
+//                        {
+//                            gravity[j] = acc[j]*(GRAVITY_EARTH/accNorm);
+//
+//                        }
+//                        rotation = orientation.rotationFromGravity(gravity);
+////                        orientation.setRotationMatrix(rotation);
+//
+//
+//                    }
 
                     else // not stable
                     {
@@ -184,16 +184,16 @@ public class MainActivity extends AppCompatActivity
 //                        {
 //                            gravity[j]=resultOfDynamic[1][j];
 //                        }
-                        System.out.println("before");
-                        g.printGravity(gravity);
-                        orientation.printRotation(rotation);
+//                        System.out.println("before");
+//                        g.printGravity(gravity);
+//                        orientation.printRotation(rotation);
                         rotation = orientation.rotationFromGravity(gravity);
-                        rotation = orientation.updateRotationMatrix(rotation,gyr,dynamic.getDeltaT());
-                        gravity = g.gravityAfterRotation(gravity,rotation);
+                        rotation = orientation.updateRotationMatrix(rotation, orientation.rotatedGyr(gyr,rotation),dynamic.getDeltaT());
+                        gravity = g.gravityAfterRotation(rotation);
 //                        orientation.setRotationMatrix(rotation);
-                        System.out.println("after");
-                        g.printGravity(gravity);
-                        orientation.printRotation(rotation);
+//                        System.out.println("after");
+//                        g.printGravity(gravity);
+//                        orientation.printRotation(rotation);
                     }
 
 
@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity
                     accGraDiffView.setLine((-1)*acc[0]*lS - (-1)*gravity[0]*lS,acc[1]*lS - gravity[1]*lS, acc[2]*lS - gravity[2]*lS);
                     gyrView.setLine(gyr[1]*lS,gyr[0]*lS, -1*gyr[2]*lS);
 
-//                    System.out.println(acc[0]+", "+acc[1]+", "+acc[2]+", "+gyr[0]+", "+gyr[1]+", "+gyr[2]+", "+gravity[0]+", "+gravity[1]+", "+gravity[2]+", ");
+                    System.out.println(acc[0]+", "+acc[1]+", "+acc[2]+", "+gyr[0]+", "+gyr[1]+", "+gyr[2]+", "+gravity[0]+", "+gravity[1]+", "+gravity[2]+", ");
 
 
 

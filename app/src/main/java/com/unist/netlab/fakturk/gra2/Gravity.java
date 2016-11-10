@@ -15,11 +15,12 @@ public class Gravity
 
 
 
-    float[] gravityAfterRotation(float[] gravity, float[][] rotationMatrix)
+    float[] gravityAfterRotation( float[][] rotationMatrix)
     {
         float[] newGravity = new float[3];
+        float[] earth = getGravityEarth();
         for (int i = 0; i < 3; i++) {
-            newGravity[i] = gravity[0]* rotationMatrix[i][0]+ gravity[1]* rotationMatrix[i][1]+gravity[2]* rotationMatrix[i][2];
+            newGravity[i] = earth[2]* rotationMatrix[i][2]+ earth[2]* rotationMatrix[i][2]+earth[2]* rotationMatrix[i][2];
         }
         float graNorm = gravityNorm(newGravity);
         for (int j = 0; j < 3; j++)

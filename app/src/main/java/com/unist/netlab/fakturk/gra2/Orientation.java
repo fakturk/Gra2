@@ -60,31 +60,73 @@ public class Orientation
 
     float[][] rotationFromGravity(float[] gravity)
     {
-        float[] gravityEarth = g.getGravityEarth();
-        float sinAlpha = (float) (gravity[0]/Math.sqrt(Math.pow(gravity[0],2)+Math.pow(gravityEarth[2],2)));
-        float cosAlpha = (float) (gravityEarth[2]/Math.sqrt(Math.pow(gravity[0],2)+Math.pow(gravityEarth[2],2)));
-        float sinBeta = (float) (gravity[1]/Math.sqrt(Math.pow(gravity[1],2)+Math.pow(gravityEarth[2],2)));
-        float cosBeta = (float) (gravityEarth[2]/Math.sqrt(Math.pow(gravity[1],2)+Math.pow(gravityEarth[2],2)));
+//        float[] gravityEarth = g.getGravityEarth();
+//        float sinAlpha = (float) (gravity[0]/Math.sqrt(Math.pow(gravity[0],2)+Math.pow(gravityEarth[2],2)));
+//        float cosAlpha = (float) (gravityEarth[2]/Math.sqrt(Math.pow(gravity[0],2)+Math.pow(gravityEarth[2],2)));
+//        float sinBeta = (float) (gravity[1]/Math.sqrt(Math.pow(gravity[1],2)+Math.pow(gravityEarth[2],2)));
+//        float cosBeta = (float) (gravityEarth[2]/Math.sqrt(Math.pow(gravity[1],2)+Math.pow(gravityEarth[2],2)));
+        float gravityNorm = g.gravityNorm(gravity);
+        float v1 = (-1)*gravity[1]/gravityNorm;
+        float v2 = gravity[0]/gravityNorm;
+        float sinTheta = (float) Math.sqrt(Math.pow(v1,2)+Math.pow(v2,2));
+        float cosTheta = gravity[2]/gravityNorm;
+
 
 
 
         float[][] R = new float[3][3];
-        R[0][0] = cosBeta;
-        R[0][1] = sinBeta * sinAlpha;
-        R[0][2] = sinBeta * cosAlpha;
+        R[0][0] = 1-((v2*v2)/(1+cosTheta));
+        R[0][1] = ((v1*v2)/(1+cosTheta));
+        R[0][2] = v2;
 
-        R[1][0] = 0;
-        R[1][1] = cosAlpha;
-        R[1][2] = -sinAlpha;
+        R[1][0] = ((v1*v2)/(1+cosTheta));
+        R[1][1] = 1-((v1*v1)/(1+cosTheta));
+        R[1][2] = -v1;
 
-        R[2][0] = -sinBeta;
-        R[2][1] = cosBeta * sinAlpha;
-        R[2][2] = cosBeta * cosAlpha;
+        R[2][0] = -v2;
+        R[2][1] = v1;
+        R[2][2] = 1-((v2*v2)+(v1*v1))/(1+cosTheta);
 
         setRotationMatrix(R);
 
         return R;
 
+
+    }
+
+    float[] rotatedGyr(float[] gyr, float[][] R)
+    {
+        float[] rotated= new float[3];
+        R=rotationTransform(R);
+
+        for (int i = 0; i < 3; i++)
+        {
+            rotated[i]=0;
+            for (int j = 0; j < 3; j++)
+            {
+                rotated[i]+= R[i][j]*gyr[j];
+            }
+        }
+        return rotated;
+    }
+
+    float[][] rotationTransform(float[][] R)
+    {
+        float[][] T=new float[3][3];
+
+        T[0][0] = R[0][0] ;
+        T[0][1] = R[1][0] ;
+        T[0][2] = R[2][0] ;
+
+        T[1][0] = R[0][1] ;
+        T[1][1] = R[1][1] ;
+        T[1][2] = R[2][1] ;
+
+        T[2][0] = R[0][2] ;
+        T[2][1] = R[1][2] ;
+        T[2][2] = R[2][2] ;
+
+        return T;
 
     }
 
@@ -113,24 +155,37 @@ public class Orientation
 
     }
 
+
     float[][] updateRotationMatrix(float[][] R, float[] gyr, float deltaT)
     {
         float[][] newRotation = new float[3][3];
-        newRotation[0][0] = R[0][0]+(R[0][1]*(-1)*gyr[2]+R[0][2]*gyr[1])*deltaT;
-        newRotation[0][1] = R[0][1]+(R[0][0]*gyr[2]+R[0][2]*(-1)*gyr[0])*deltaT;
-        newRotation[0][2] = R[0][2]+(R[0][0]*(-1)*gyr[1]+R[0][1]*gyr[0])*deltaT;
 
-        newRotation[1][0] = R[1][0]+(R[1][1]*(-1)*gyr[2]+R[1][2]*gyr[1])*deltaT;
-        newRotation[1][1] = R[1][1]+(R[1][0]*gyr[2]+R[1][2]*(-1)*gyr[0])*deltaT;
-        newRotation[1][2] = R[1][2]+(R[1][0]*(-1)*gyr[1]+R[1][1]*gyr[0])*deltaT;
+//        printRotation(R);
+        if ((Math.abs(gyr[0])+Math.abs(gyr[1])+Math.abs(gyr[2]))>0)
+        {
+            System.out.println("gyr bigger than 0");
+            System.out.println(deltaT);
+        }
 
-        newRotation[2][0] = R[2][0]+(R[2][1]*(-1)*gyr[2]+R[2][2]*gyr[1])*deltaT;
-        newRotation[2][1] = R[2][1]+(R[2][0]*gyr[2]+R[2][2]*(-1)*gyr[0])*deltaT;
-        newRotation[2][2] = R[2][2]+(R[2][0]*(-1)*gyr[1]+R[2][1]*gyr[0])*deltaT;
 
-        setRotationMatrix(newRotation);
+            newRotation[0][0] = R[0][0]+(R[0][1]*(-1)*gyr[2]+R[0][2]*gyr[1])*deltaT;
+            newRotation[0][1] = R[0][1]+(R[0][0]*gyr[2]+R[0][2]*(-1)*gyr[0])*deltaT;
+            newRotation[0][2] = R[0][2]+(R[0][0]*(-1)*gyr[1]+R[0][1]*gyr[0])*deltaT;
 
-        return newRotation;
+            newRotation[1][0] = R[1][0]+(R[1][1]*(-1)*gyr[2]+R[1][2]*gyr[1])*deltaT;
+            newRotation[1][1] = R[1][1]+(R[1][0]*gyr[2]+R[1][2]*(-1)*gyr[0])*deltaT;
+            newRotation[1][2] = R[1][2]+(R[1][0]*(-1)*gyr[1]+R[1][1]*gyr[0])*deltaT;
+
+            newRotation[2][0] = R[2][0]+(R[2][1]*(-1)*gyr[2]+R[2][2]*gyr[1])*deltaT;
+            newRotation[2][1] = R[2][1]+(R[2][0]*gyr[2]+R[2][2]*(-1)*gyr[0])*deltaT;
+            newRotation[2][2] = R[2][2]+(R[2][0]*(-1)*gyr[1]+R[2][1]*gyr[0])*deltaT;
+
+            setRotationMatrix(newRotation);
+//        printRotation(newRotation);
+
+            return newRotation;
+
+
     }
 
     void printRotation(float[][]R)
