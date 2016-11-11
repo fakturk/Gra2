@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity
                                 gravity[j] = acc[j]*(GRAVITY_EARTH/accNorm);
 
                             }
-                            rotation = orientation.rotationFromGravity(gravity);
+//                            rotation = orientation.rotationFromGravity(gravity);
 //                            orientation.setRotationMatrix(rotation);
                             counter=0;
                         }
